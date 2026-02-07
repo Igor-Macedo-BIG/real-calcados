@@ -72,6 +72,17 @@ export default function Lojas() {
     setEditingIndex(index);
   };
 
+  const handleDelete = async (index: number) => {
+    const loja = lojas[index];
+    if (loja.id) {
+      const { error } = await supabase.from('lojas').delete().eq('id', loja.id);
+      if (error) console.error(error);
+      else {
+        setLojas(lojas.filter((_, i) => i !== index));
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-black text-white">
       <header className="bg-gradient-to-r from-gray-900 to-black text-white py-8 border-b border-gray-700 shadow-lg relative">
@@ -232,12 +243,18 @@ export default function Lojas() {
                         <span className="text-white">{loja.responsavel || 'Não informado'}</span>
                       </div>
                     </div>
-                    <div className="mt-6">
+                    <div className="mt-6 flex gap-2">
                       <button
                         onClick={() => handleEdit(index)}
-                        className="w-full bg-gradient-to-r from-yellow-600 to-yellow-700 text-white px-6 py-2 rounded-lg hover:from-yellow-700 hover:to-yellow-800 transition shadow-lg hover:shadow-yellow-500/50 font-medium"
+                        className="flex-1 bg-gradient-to-r from-yellow-600 to-yellow-700 text-white px-6 py-2 rounded-lg hover:from-yellow-700 hover:to-yellow-800 transition shadow-lg hover:shadow-yellow-500/50 font-medium"
                       >
                         Editar Loja
+                      </button>
+                      <button
+                        onClick={() => handleDelete(index)}
+                        className="flex-1 bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-2 rounded-lg hover:from-red-700 hover:to-red-800 transition shadow-lg hover:shadow-red-500/50 font-medium"
+                      >
+                        Excluir Loja
                       </button>
                     </div>
                   </div>
