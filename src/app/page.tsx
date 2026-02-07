@@ -109,7 +109,7 @@ export default function Home() {
         <div className="bg-gray-900 p-4 md:p-6 rounded-lg mb-4 md:mb-8">
           <div className="flex items-center justify-between cursor-pointer" onClick={() => setShowForm(!showForm)}>
             <h2 className="text-lg md:text-2xl font-semibold text-white">{editingIndex !== null ? 'Editar Loja' : 'Cadastrar Nova Loja'}</h2>
-            <button type="button" className="text-blue-400 hover:text-blue-300 text-xl">
+            <button type="button" className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-full shadow-lg hover:shadow-blue-500/50 text-lg font-bold transition">
               {showForm ? '−' : '+'}
             </button>
           </div>
@@ -213,12 +213,7 @@ export default function Home() {
                           >
                             Editar
                           </button>
-                          <button
-                            onClick={() => handleDelete(index)}
-                            className="bg-red-600 text-white px-2 md:px-4 py-1 rounded hover:bg-red-700 shadow-md hover:shadow-red-500/50 text-xs md:text-sm"
-                          >
-                            Excluir
-                          </button>
+
                         </td>
                       </tr>
                     ))}
