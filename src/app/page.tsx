@@ -199,7 +199,7 @@ export default function Home() {
                       <tr key={index} className="border-b border-gray-800 hover:bg-gray-800">
                         <td className="p-2 md:p-3 text-white">{loja.instagram}</td>
                         <td className="p-2 md:p-3">
-                          <a onClick={() => window.open(loja.link_instagram.replace('www.instagram.com', 'm.instagram.com'), '_blank', 'noopener,noreferrer')} className="text-blue-400 hover:text-blue-300 text-sm md:text-base cursor-pointer">
+                          <a href={loja.link_instagram.replace('www.instagram.com', 'm.instagram.com') + '?utm_source=ig_web_button_share_sheet'} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 text-sm md:text-base">
                             Ver Perfil
                           </a>
                         </td>
