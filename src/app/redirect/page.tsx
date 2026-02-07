@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-export default function Redirect() {
+function RedirectContent() {
   const searchParams = useSearchParams();
   const url = searchParams.get('url');
   const [loading, setLoading] = useState(true);
@@ -40,5 +40,13 @@ export default function Redirect() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function Redirect() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-black text-white flex items-center justify-center">Carregando...</div>}>
+      <RedirectContent />
+    </Suspense>
   );
 }
