@@ -14,6 +14,10 @@ function RedirectContent() {
       setTimeout(() => {
         window.open(decodeURIComponent(url), '_blank', 'noopener,noreferrer');
         setLoading(false);
+        // Navegar de volta para a página inicial
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1500);
       }, 500);
     }
   }, [url]);
