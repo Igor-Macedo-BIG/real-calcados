@@ -17,6 +17,8 @@ export default function Home() {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [form, setForm] = useState<Loja>({ instagram: '', link_instagram: '', email: '', senha: '', responsavel: '' });
   const [showForm, setShowForm] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [instagramData, setInstagramData] = useState<Record<string, { bio: string; link: string; posts: number; followers: number }>>({});
 
   useEffect(() => {
     const fetchLojas = async () => {
@@ -25,7 +27,39 @@ export default function Home() {
       else setLojas(data || []);
     };
     fetchLojas();
+
+    // Detect mobile
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  useEffect(() => {
+    const fetchInstagramData = async () => {
+      for (const loja of lojas) {
+        const username = loja.instagram.slice(1);
+        if (!instagramData[username]) {
+          try {
+            const res = await fetch(`/api/instagram/${username}`);
+            if (res.ok) {
+              const data = await res.json();
+              setInstagramData(prev => ({ ...prev, [username]: data }));
+            }
+          } catch (error) {
+            console.error(error);
+          }
+          // Delay to avoid rate limit
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+    };
+    if (lojas.length > 0) {
+      fetchInstagramData();
+    }
+  }, [lojas, instagramData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -187,36 +221,41 @@ export default function Home() {
                   <thead>
                     <tr className="border-b border-gray-700">
                       <th className="p-2 md:p-3 text-gray-300">Instagram</th>
+                      <th className="p-2 md:p-3 text-gray-300">Bio</th>
                       <th className="p-2 md:p-3 text-gray-300">Link</th>
-                      <th className="p-2 md:p-3 text-gray-300">E-mail</th>
-                      <th className="p-2 md:p-3 text-gray-300">Senha</th>
-                      <th className="p-2 md:p-3 text-gray-300">Responsável</th>
+                      <th className="p-2 md:p-3 text-gray-300">Posts</th>
+                      <th className="p-2 md:p-3 text-gray-300">Seguidores</th>
                       <th className="p-2 md:p-3 text-gray-300">Ações</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {lojas.map((loja, index) => (
-                      <tr key={index} className="border-b border-gray-800 hover:bg-gray-800">
-                        <td className="p-2 md:p-3 text-white">{loja.instagram}</td>
-                        <td className="p-2 md:p-3">
-                          <a href={`/redirect?url=${encodeURIComponent(loja.link_instagram.replace('www.instagram.com', 'm.instagram.com') + '?igsh=ZDNlZDc0MzIxNw==')}`} className="text-blue-400 hover:text-blue-300 text-sm md:text-base">
-                            Ver Perfil
-                          </a>
-                        </td>
-                        <td className="p-2 md:p-3">{loja.email ? "✅" : "❌"}</td>
-                        <td className="p-2 md:p-3">{loja.senha ? "✅" : "❌"}</td>
-                        <td className="p-2 md:p-3 text-white">{loja.responsavel || '—'}</td>
-                        <td className="p-2 md:p-3 flex gap-1 md:gap-2">
-                          <button
-                            onClick={() => handleEdit(index)}
-                            className="bg-yellow-600 text-white px-2 md:px-4 py-1 rounded hover:bg-yellow-700 shadow-md hover:shadow-yellow-500/50 text-xs md:text-sm"
-                          >
-                            Editar
-                          </button>
-
-                        </td>
-                      </tr>
-                    ))}
+                    {lojas.map((loja, index) => {
+                      const username = loja.instagram.slice(1);
+                      const data = instagramData[username] || {};
+                      return (
+                        <tr key={index} className="border-b border-gray-800 hover:bg-gray-800">
+                          <td className="p-2 md:p-3 text-white">{loja.instagram}</td>
+                          <td className="p-2 md:p-3 text-white">{data.bio || 'Carregando...'}</td>
+                          <td className="p-2 md:p-3">
+                            {data.link ? (
+                              <a href={data.link} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 text-sm md:text-base">
+                                Link
+                              </a>
+                            ) : '—'}
+                          </td>
+                          <td className="p-2 md:p-3 text-white">{data.posts || '—'}</td>
+                          <td className="p-2 md:p-3 text-white">{data.followers || '—'}</td>
+                          <td className="p-2 md:p-3 flex gap-1 md:gap-2">
+                            <button
+                              onClick={() => handleEdit(index)}
+                              className="bg-yellow-600 text-white px-2 md:px-4 py-1 rounded hover:bg-yellow-700 shadow-md hover:shadow-yellow-500/50 text-xs md:text-sm"
+                            >
+                              Editar
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
